@@ -5,11 +5,25 @@
 #include <string>
 #include <cstring>
 #include <limits>
+#include <fstream>
+
 using namespace std;
 
+// Using C library for MySQL
 // To compile for MYSQL use these flags:
 //  g++ menu.cpp -o menu1.out `mysql_config --cflags --libs`
 
+char getCategoryResponse() {
+
+  char response;
+	cout << endl << "Pick Category: " << endl
+		 << "(B)edroom, (K)itchen, b(A)throom, (L)ivingRoom (O)ffice" << endl
+		 << "> ";
+	cin >> response;
+	cin.ignore(256, '\n');
+	return response;
+
+}
 
 // MYSQL Error handling function
 void finish_with_errors(MYSQL *con) {
@@ -48,16 +62,10 @@ void addData() {
  cout << "Item Count: " << endl;
  cin >> itemInv;
  cin.ignore(256, '\n');
- char cat;
- cout << "Which Category? " << endl <<
-     "(B)edroom, (K)itchen, b(A)throom, (L)ivingRoom" << endl;
-
- cin >> cat;
- cin.ignore(256, '\n');
 
 
  // Add appropriate sql depending on category chosen
- switch (cat) {
+ switch (getCategoryResponse()) {
    case 'b': sqlString = "INSERT INTO bedroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
    case 'k': sqlString = "INSERT INTO kitchen (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
    case 'a': sqlString = "INSERT INTO bathroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
@@ -95,14 +103,14 @@ void dispData() {
 
  // Code to ask user a Category
   string sqlString;
-  char choice;
-  cout << "Which Category? " << endl <<
-      "(B)edroom, (K)itchen, b(A)throom, (L)ivingRoom (O)ffice" << endl;
-
-  cin >> choice;
+  // char choice;
+  // cout << "Which Category? " << endl <<
+  //     "(B)edroom, (K)itchen, b(A)throom, (L)ivingRoom (O)ffice" << endl;
+  //
+  // cin >> choice;
 
   // Add appropriate sql depending on category chosen
-  switch (choice) {
+  switch (getCategoryResponse()) {
     case 'b': sqlString = "SELECT * FROM bedroom;"; break;
     case 'k': sqlString = "SELECT * FROM kitchen;"; break;
     case 'a': sqlString = "SELECT * FROM bathroom;"; break;
@@ -140,6 +148,16 @@ void dispData() {
     cout << " " << endl;
 }
 
+
+//Function to clear text file
+void clearFile() {
+
+
+  std::ofstream myfile;
+  myfile.open("orders.txt", ofstream::out | ofstream::trunc);
+  myfile.close();
+}
+
 // function to search low inventory
 void checkInv() {
 
@@ -154,22 +172,17 @@ void checkInv() {
       finish_with_errors(con);
    }
 
-   // Code to ask user a Category
+    // Code to ask user a Category
     string sqlString;
-    char choice;
-    cout << "Which Category? " << endl <<
-        "(B)edroom, (K)itchen, b(A)throom, (L)ivingRoom (O)ffice" << endl;
 
-    cin >> choice;
-    cin.ignore(256, '\n');
 
     // Add appropriate sql depending on category chosen
-    switch (choice) {
+    switch ( getCategoryResponse() ) {
       case 'b': sqlString = "SELECT * FROM bedroom WHERE itemInv < 5;"; break;
       case 'k': sqlString = "SELECT * FROM kitchen WHERE itemInv < 5;"; break;
       case 'a': sqlString = "SELECT * FROM bathroom WHERE itemInv < 5;"; break;
       case 'l': sqlString = "SELECT * FROM livingroom WHERE itemInv < 5;"; break;
-      case 'o': sqlString = "SELECT * FROM office WHERE itemInv < 15;"; break;
+      case 'o': sqlString = "SELECT * FROM office WHERE itemInv < 5;"; break;
       default : cout << "Make a selection:";
     }
 
@@ -205,25 +218,57 @@ void checkInv() {
     char answer;
     string ans;
     int amount;
-    cout << '\n' << "Order More? " << '\n';
-    cout << "(Y)es, (N)o " << '\n';
-    cin >> answer;
-    cin.ignore(256, '\n');
-    if (answer == 'y') {
-      cout << "Order more of: " << '\n';
-      cin >> ans;
+    bool run = true;
+
+    do {
+
+      cout << '\n' << "Order More? " << '\n';
+      cout << "(Y)es, (N)o, (B)ack to Main" << '\n';
+      cin >> answer;
       cin.ignore(256, '\n');
-      cout << "Quantity? " << '\n';
-      cin >> amount;
-      cin.ignore(256, '\n');
-      cout << "You Have ordered " << amount << " more " << ans << '\n';
+
+      switch (answer) {
+        case 'y': {cout << "Order more of: " << '\n';
+                  cin >> ans;
+                  cin.ignore(256, '\n');
+                  cout << "Quantity? " << '\n';
+                  cin >> amount;
+                  cin.ignore(256, '\n');
+                  cout << "You Have ordered " << amount << " more " << ans << '\n';
+                  ofstream myfile;
+                  myfile.open("orders.txt", std::ios::app);
+                  myfile << ans << " " << amount << '\n';
+                  myfile.close();} break;
+        case 'n': run = false; break;
+        case 'b': run = false; break;
+        default: cout << "Please Make A Choice: " << '\n';
+      }
+    } while(run);
+
+    //Since we are working with either a blank file or a file with content    // we can check to see if file is populated or blank.
+    // If blank we will skip emailing.
+    int count = 0;
+    string line;
+    ifstream file("orders.txt");
+
+    while (getline(file, line))
+
+        count++;
+
+    if (count > 0) {
+      cout << "Sending email to Purchasing Dept...." << '\n';
+      system("cat /home/skunky/Documents/college/COMP1100_cpp/project/cpp-group-project/orders.txt | mail -s 'Items to Be ordered' randall.flagg15@gmail.com");
     }
 
+    // Clear file after email.....
+    clearFile();
 
 }
 
 
-// menu function
+
+
+// Main menu function
 char getMenuResponse() {
 
   char response;
@@ -236,9 +281,22 @@ char getMenuResponse() {
 
 }
 
-
+/////////////////////////////////////
+////////Main Function////////////////
+////////////////////////////////////
 int main( int argc, char *argv[] ) {
   bool run = true;
+  cout << "######################" << '\n';
+  cout << "######################" << '\n';
+  cout << "\033[1;31mCNTS GROUP 7 INVENTORY\033[0m" << '\n';
+  cout << "###\033[1;31mCONTROL PROGRAM\033[0m####" << '\n';
+  cout << "######################" << '\n';
+  cout << "#\033[1;33mJoel\033[0m######\033[1;34mSamir\033[0m######" << '\n';
+  cout << "######################" << '\n';
+  cout << "#\033[1;35mDamon\033[0m#####\033[1;37mThomas\033[0m#####" << '\n';
+  cout << "######################" << '\n';
+  cout << "######################" << '\n';
+
   do
   {
     cout << "Inventory Program - " << endl;
