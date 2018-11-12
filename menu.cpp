@@ -112,7 +112,7 @@ char getMenuResponse() {
 
   char response;
 	cout << endl << "Pick Category: " << endl
-		 << "(A)dd Item, (S)earh, (L)iving Room, b(E)droom, (Q)uit" << endl
+		 << "(A)dd Item, (S)earch, (L)iving Room, b(E)droom, (Q)uit" << endl
 		 << "> ";
 	cin >> response;
 	cin.ignore(256, '\n');
