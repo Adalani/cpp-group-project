@@ -21,8 +21,7 @@ char getCategoryResponse() {
 		 << "> ";
 	cin >> response;
 	cin.ignore(256, '\n');
-	return response;
-
+  return response;
 }
 
 // MYSQL Error handling function
@@ -63,7 +62,6 @@ void addData() {
  cin >> itemInv;
  cin.ignore(256, '\n');
 
-
  // Add appropriate sql depending on category chosen
  switch (getCategoryResponse()) {
    case 'b': sqlString = "INSERT INTO bedroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
@@ -71,19 +69,19 @@ void addData() {
    case 'a': sqlString = "INSERT INTO bathroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
    case 'l': sqlString = "INSERT INTO livingroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
    case 'o': sqlString = "INSERT INTO office (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
-   default : cout << "Make a selection:";
+   default : cout << "Make a selection:" << '\n';
  }
 
  // turn sqlstring into proper data type
- const char *newString = sqlString.c_str();
+   const char *newString = sqlString.c_str();
 
- // Insert data into database
- if (mysql_query( con, newString )) {
-  finish_with_errors(con);
- }
+   // Insert data into database
+   if (mysql_query( con, newString )) {
+    finish_with_errors(con);
+   }
 
- mysql_close(con);
- cout << "Item Added Successfully!" << endl << endl;
+   mysql_close(con);
+   cout << "Item Added Successfully!" << endl << endl;
 
 }
 //
@@ -103,11 +101,6 @@ void dispData() {
 
  // Code to ask user a Category
   string sqlString;
-  // char choice;
-  // cout << "Which Category? " << endl <<
-  //     "(B)edroom, (K)itchen, b(A)throom, (L)ivingRoom (O)ffice" << endl;
-  //
-  // cin >> choice;
 
   // Add appropriate sql depending on category chosen
   switch (getCategoryResponse()) {
@@ -116,9 +109,9 @@ void dispData() {
     case 'a': sqlString = "SELECT * FROM bathroom;"; break;
     case 'l': sqlString = "SELECT * FROM livingroom;"; break;
     case 'o': sqlString = "SELECT * FROM office;"; break;
-    default : cout << "Make a selection:";
+    default : cout << "Make a selection:" << '\n';
   }
- // Code to ask user a Category
+
 
   // convert char
   const char *newString = sqlString.c_str();
@@ -214,7 +207,6 @@ void checkInv() {
     mysql_close(con);
     cout << " " << endl;
 
-    // Dummy code to appear as to have ordered more....
     char answer;
     string ans;
     int amount;
@@ -258,6 +250,7 @@ void checkInv() {
     if (count > 0) {
       cout << "Sending email to Purchasing Dept...." << '\n';
       system("cat /home/skunky/Documents/college/COMP1100_cpp/project/cpp-group-project/orders.txt | mail -s 'Items to Be ordered' randall.flagg15@gmail.com");
+      cout << "Email Sent!" << '\n' << '\n';
     }
 
     // Clear file after email.....
@@ -272,8 +265,8 @@ void checkInv() {
 char getMenuResponse() {
 
   char response;
-	cout << endl << "Pick Category: " << endl
-		 << "(A)dd Item, (S)earh, (I)nventory Check (Q)uit" << endl
+	cout << endl << "Pick Option: " << endl
+		 << "(A)dd Item, (S)earch, (I)nventory Check (Q)uit" << endl
 		 << "> ";
 	cin >> response;
 	cin.ignore(256, '\n');
