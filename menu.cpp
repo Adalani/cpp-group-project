@@ -11,7 +11,7 @@ using namespace std;
 
 // Using C library for MySQL
 // To compile for MYSQL use these flags:
-//  g++ menu.cpp -o menu1.out `mysql_config --cflags --libs`
+//  g++ menu.cpp -o menu1.out `mysql_config --cflags --libs` --> compiling
 
 char getCategoryResponse() {
 
@@ -306,7 +306,6 @@ int main( int argc, char *argv[] ) {
   } while (run);
   cout << endl << "Program Terminated" << endl;
 }
-<<<<<<< HEAD
 
 char getMenuResponse() {
 
@@ -319,5 +318,3 @@ char getMenuResponse() {
 	return toupper(response);
 
 }
-=======
->>>>>>> thomas
