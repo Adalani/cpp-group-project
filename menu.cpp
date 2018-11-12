@@ -266,7 +266,7 @@ char getMenuResponse() {
 
   char response;
 	cout << endl << "Pick Option: " << endl
-		 << "(A)dd Item, (S)earh, (I)nventory Check (Q)uit" << endl
+		 << "(A)dd Item, (S)earch, (I)nventory Check (Q)uit" << endl
 		 << "> ";
 	cin >> response;
 	cin.ignore(256, '\n');
@@ -305,16 +305,4 @@ int main( int argc, char *argv[] ) {
   	}
   } while (run);
   cout << endl << "Program Terminated" << endl;
-}
-
-char getMenuResponse() {
-
-  char response;
-	cout << endl << "Pick Category: " << endl
-		 << "(A)dd Item, (S)earch, (L)iving Room, b(E)droom, (Q)uit" << endl
-		 << "> ";
-	cin >> response;
-	cin.ignore(256, '\n');
-	return toupper(response);
-
 }
