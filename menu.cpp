@@ -249,12 +249,14 @@ void checkInv() {
 
     if (count > 0) {
       cout << "Sending email to Purchasing Dept...." << '\n';
-      system("cat /home/skunky/Documents/college/COMP1100_cpp/project/cpp-group-project/orders.txt | mail -s 'Items to Be ordered' randall.flagg15@gmail.com");
+      system("cat /home/skunky/Documents/college/COMP1100_cpp/project/cpp-group-project/orders.txt | msmtp -a default randall.flagg15@gmail.com");
       cout << "Email Sent!" << '\n' << '\n';
+      //Clear File after email sends....
+      clearFile();
     }
 
     // Clear file after email.....
-    clearFile();
+   // clearFile();
 
 }
 
