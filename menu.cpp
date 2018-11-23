@@ -11,7 +11,7 @@ using namespace std;
 
 // Using C library for MySQL
 // To compile for MYSQL use these flags:
-//  g++ menu.cpp -o menu1.out `mysql_config --cflags --libs` --> compiling
+// g++ menu.cpp -o menu1.out `mysql_config --cflags --libs` --> compiling
 
 char getCategoryResponse() {
 
@@ -64,23 +64,23 @@ void addData() {
  cin.ignore(256, '\n');
  cout << "Item Price: " << endl;
  cin >> itemPrice;
-// Check to see if user's input is valid.
+ // Check to see if user's input is valid.
  if(cin.fail()) {
    cout << "Nice try, Brayden." << endl;
  }
  cin.ignore(256, '\n');
  cout << "Item Count: " << endl;
  cin >> itemInv;
-// Check to see if user's input is valid.
+ // Check to see if user's input is valid.
  if(cin.fail()) {
    cout << "Nice try, Brayden." << endl;
  }
  cin.ignore(256, '\n');
  
-// Check whether or not the user's input is valid.
-if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
-  cout << "Your input is not valid." << endl;
-} else {
+ // Check whether or not the user's input is valid.
+ if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
+ cout << "Your input is not valid." << endl;
+ } else {
   // Add appropriate sql depending on category chosen
   switch (getCategoryResponse()) {
     case 'b': sqlString = "INSERT INTO bedroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
@@ -101,7 +101,6 @@ if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
 
     mysql_close(con);
     cout << "Item Added Successfully!" << endl << endl;
-
   }
 }
 // //////////////////////// //
@@ -131,7 +130,6 @@ void dispData() {
     case 'o': sqlString = "SELECT * FROM office;"; break;
     default : cout << "Make a selection:" << '\n';
   }
-
 
   // convert char
   const char *newString = sqlString.c_str();
