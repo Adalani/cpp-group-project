@@ -63,7 +63,8 @@ void addData() {
  cout << "Item Count: " << endl;
  cin >> itemInv;
  cin.ignore(256, '\n');
- // Checks whether or not the users input is valid, otherwise, accesses the respective code.
+ 
+ // Checks whether or not the user's input is valid, otherwise, accesses the respective code.
 if(cin.fail() != 'b'||'k'||'a'||'l'||'o'){
   cout<<"Your input was not valid."<<endl;
 } else {
