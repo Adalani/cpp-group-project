@@ -22,11 +22,10 @@ char getCategoryResponse() {
 	cin >> response;
 	cin.ignore(256, '\n');
   // Check whether or not the user's input is valid.
-    if(cin.fail() == 'b'||'k'||'a'||'l'||'o'){
-      cout<<"Your input is not valid."<<endl;
-    } else {
+    if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
+      cout << "Your input is not valid." << endl;
+    }
     return response;
-  }
 }
 // MYSQL Error handling function
 void finish_with_errors(MYSQL *con) {
@@ -68,9 +67,9 @@ void addData() {
  cin >> itemInv;
  cin.ignore(256, '\n');
  
- // Checks whether or not the user's input is valid, otherwise, accesses the respective code.
-if(cin.fail() != 'b'||'k'||'a'||'l'||'o'){
-  cout<<"Your input was not valid."<<endl;
+ // Check whether or not the user's input is valid.
+if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
+  cout << "Your input is not valid." << endl;
 } else {
   // Add appropriate sql depending on category chosen
   switch (getCategoryResponse()) {
@@ -95,7 +94,7 @@ if(cin.fail() != 'b'||'k'||'a'||'l'||'o'){
 
   }
 }
-//
+// //////////////////////
 // function to display data
 // //////////////////////
 void dispData() {
@@ -229,10 +228,7 @@ void checkInv() {
       cout << "(Y)es, (N)o, (B)ack to Main" << '\n';
       cin >> answer;
       // Check whether or not the user's input is valid.
-      if(cin.fail() != 'y'||'n'||'b'){
-        cout<<"Your input is not valid."<<endl;
-      } else {
-        cin.ignore(256, '\n');
+      cin.ignore(256, '\n');
 
         switch (answer) {
           case 'y': {cout << "Order more of: " << '\n';
@@ -248,28 +244,27 @@ void checkInv() {
                     myfile.close();} break;
           case 'n': run = false; break;
           case 'b': run = false; break;
-          default: cout << "Please Make A Choice: " << '\n';
+          default: cout << "Not valid. Please Make A Choice: " << '\n';
         }
+      } while(run);
+
+      //Since we are working with either a blank file or a file with content    // we can check to see if file is populated or blank.
+      // If blank we will skip emailing.
+      int count = 0;
+      string line;
+      ifstream file("orders.txt");
+
+      while (getline(file, line))
+
+          count++;
+
+      if (count > 0) {
+        cout << "Sending email to Purchasing Dept...." << '\n';
+        system("cat /home/group/github/cpp-group-project/orders.txt | mail -s 'Orders' randall.flagg15@gmail.com");
+        cout << "Email Sent!" << '\n' << '\n';
+        //Clear File after email sends....
+        clearFile();
       }
-    } while(run);
-
-    //Since we are working with either a blank file or a file with content    // we can check to see if file is populated or blank.
-    // If blank we will skip emailing.
-    int count = 0;
-    string line;
-    ifstream file("orders.txt");
-
-    while (getline(file, line))
-
-        count++;
-
-    if (count > 0) {
-      cout << "Sending email to Purchasing Dept...." << '\n';
-      system("cat /home/group/github/cpp-group-project/orders.txt | mail -s 'Orders' randall.flagg15@gmail.com");
-      cout << "Email Sent!" << '\n' << '\n';
-      //Clear File after email sends....
-      clearFile();
-    }
 
 }
 
@@ -281,6 +276,9 @@ char getMenuResponse() {
 		 << "(A)dd Item, (S)earch, (I)nventory Check (Q)uit" << endl
 		 << "> ";
 	cin >> response;
+  if (cin.fail() != 'a'||'s'||'i'||'q') {
+    cout << "Your input is not valid." << endl;
+  }
 	cin.ignore(256, '\n');
 	return toupper(response);
 
@@ -309,6 +307,7 @@ int main( int argc, char *argv[] ) {
     
   	switch ( getMenuResponse() )
   	{
+
 	    case 'A': addData(); break;
   		case 'S': dispData(); break;
   		case 'I': checkInv(); break;
