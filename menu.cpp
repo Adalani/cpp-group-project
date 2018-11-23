@@ -34,7 +34,6 @@ void finish_with_errors(MYSQL *con) {
   exit(1);
 }
 
-
 // Function to Add Data
 void addData() {
   MYSQL *con = mysql_init(NULL);
@@ -43,7 +42,6 @@ void addData() {
     fprintf(stderr, "%s\n", mysql_error(con));
     exit(1);
   }
-
 
   // Conn to MYSQL follows this syntax: "host", "user", "pass", "database"
   if (mysql_real_connect(con, "localhost", "team", "qwerty", "testdb", 0, NULL, 0) == NULL) {
@@ -59,24 +57,27 @@ void addData() {
  cout << "--------------" << endl;
  cout << "Item Name: " << endl;
  cin >> itemName;
+ // Check to see if user's input is valid.
  if(cin.fail()) {
    cout << "Nice try, Brayden." << endl;
  }
  cin.ignore(256, '\n');
  cout << "Item Price: " << endl;
  cin >> itemPrice;
+// Check to see if user's input is valid.
  if(cin.fail()) {
    cout << "Nice try, Brayden." << endl;
  }
  cin.ignore(256, '\n');
  cout << "Item Count: " << endl;
  cin >> itemInv;
+// Check to see if user's input is valid.
  if(cin.fail()) {
    cout << "Nice try, Brayden." << endl;
  }
  cin.ignore(256, '\n');
  
- // Check whether or not the user's input is valid.
+// Check whether or not the user's input is valid.
 if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
   cout << "Your input is not valid." << endl;
 } else {
@@ -90,7 +91,7 @@ if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
     default : cout << "Make a selection:" << '\n';
   }
 
-  // turn sqlstring into proper data type
+    // turn sqlstring into proper data type
     const char *newString = sqlString.c_str();
 
     // Insert data into database
@@ -103,9 +104,9 @@ if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
 
   }
 }
-// //////////////////////
-// function to display data
-// //////////////////////
+// //////////////////////// //
+// function to display data //
+// //////////////////////// //
 void dispData() {
   MYSQL *con = mysql_init(NULL);
 
@@ -118,7 +119,7 @@ void dispData() {
     finish_with_errors(con);
  }
 
- // Code to ask user a Category
+  // Code to ask user a Category
   string sqlString;
 
   // Add appropriate sql depending on category chosen
@@ -138,8 +139,7 @@ void dispData() {
   // Dump database rows:
   if (mysql_query(con, newString)) {
     finish_with_errors(con);
- }
-
+  }
 
   MYSQL_RES *result = mysql_store_result(con);
 
@@ -160,10 +160,8 @@ void dispData() {
     cout << " " << endl;
 }
 
-
 //Function to clear text file
 void clearFile() {
-
 
   std::ofstream myfile;
   myfile.open("orders.txt", ofstream::out | ofstream::trunc);
@@ -173,109 +171,110 @@ void clearFile() {
 // function to search low inventory
 void checkInv() {
 
-    MYSQL *con = mysql_init(NULL);
+  MYSQL *con = mysql_init(NULL);
 
-    if (con == NULL) {
-      fprintf(stderr, "%s\n", mysql_error(con));
-      exit(1);
-    }
+  if (con == NULL) {
+    fprintf(stderr, "%s\n", mysql_error(con));
+    exit(1);
+  }
 
-    if (mysql_real_connect(con, "localhost", "team", "qwerty", "testdb", 0, NULL, 0) == NULL) {
-      finish_with_errors(con);
-   }
+  if (mysql_real_connect(con, "localhost", "team", "qwerty", "testdb", 0, NULL, 0) == NULL) {
+    finish_with_errors(con);
+  }
 
-    // Code to ask user a Category
-    string sqlString;
+  // Code to ask user a Category
+  string sqlString;
 
+  // Add appropriate sql depending on category chosen
+  switch ( getCategoryResponse() ) {
+    case 'b': sqlString = "SELECT * FROM bedroom WHERE itemInv < 5;"; break;
+    case 'k': sqlString = "SELECT * FROM kitchen WHERE itemInv < 5;"; break;
+    case 'a': sqlString = "SELECT * FROM bathroom WHERE itemInv < 5;"; break;
+    case 'l': sqlString = "SELECT * FROM livingroom WHERE itemInv < 5;"; break;
+    case 'o': sqlString = "SELECT * FROM office WHERE itemInv < 5;"; break;
+    default : cout << "Make a selection:";
+  }
 
-    // Add appropriate sql depending on category chosen
-    switch ( getCategoryResponse() ) {
-      case 'b': sqlString = "SELECT * FROM bedroom WHERE itemInv < 5;"; break;
-      case 'k': sqlString = "SELECT * FROM kitchen WHERE itemInv < 5;"; break;
-      case 'a': sqlString = "SELECT * FROM bathroom WHERE itemInv < 5;"; break;
-      case 'l': sqlString = "SELECT * FROM livingroom WHERE itemInv < 5;"; break;
-      case 'o': sqlString = "SELECT * FROM office WHERE itemInv < 5;"; break;
-      default : cout << "Make a selection:";
-    }
+  // convert char
+  const char *newString = sqlString.c_str();
 
-    // convert char
-    const char *newString = sqlString.c_str();
+  cout << "You are Low on...." << '\n';
+  // Dump database rows:
+  if (mysql_query(con, newString)) {
+    finish_with_errors(con);
+  }
 
-    cout << "You are Low on...." << '\n';
-    // Dump database rows:
-    if (mysql_query(con, newString)) {
-      finish_with_errors(con);
-   }
+  MYSQL_RES *result = mysql_store_result(con);
 
-    MYSQL_RES *result = mysql_store_result(con);
+  int num_fields = mysql_num_fields(result);
 
-    int num_fields = mysql_num_fields(result);
+  MYSQL_ROW row;
 
-    MYSQL_ROW row;
-
-    while ((row = mysql_fetch_row(result))) {
-      for (int i = 0; i < num_fields; i++) {
-        printf("%s ", row[i] ? row[i] : "NULL" );
-
-      }
-      printf("\n" );
+  while ((row = mysql_fetch_row(result))) {
+    for (int i = 0; i < num_fields; i++) {
+      printf("%s ", row[i] ? row[i] : "NULL" );
 
     }
+    printf("\n" );
 
-    mysql_free_result(result);
-    mysql_close(con);
-    cout << " " << endl;
+  }
 
-    char answer;
-    string ans;
-    int amount;
-    bool run = true;
+  mysql_free_result(result);
+  mysql_close(con);
+  cout << " " << endl;
 
-    do {
+  char answer;
+  string ans;
+  int amount;
+  bool run = true;
 
-      cout << '\n' << "Order More? " << '\n';
-      cout << "(Y)es, (N)o, (B)ack to Main" << '\n';
-      cin >> answer;
-      if(cin.fail()) {
-        cout << "Nice try, Brayden." << endl;
-      }
-      cin.ignore(256, '\n');
+  do {
 
-        switch (answer) {
-          case 'y': {cout << "Order more of: " << '\n';
-                    cin >> ans;
-                    cin.ignore(256, '\n');
-                    cout << "Quantity? " << '\n';
-                    cin >> amount;
-                    cin.ignore(256, '\n');
-                    cout << "You Have ordered " << amount << " more " << ans << '\n';
-                    ofstream myfile;
-                    myfile.open("orders.txt", std::ios::app);
-                    myfile << ans << " " << amount << '\n';
-                    myfile.close();} break;
-          case 'n': run = false; break;
-          case 'b': run = false; break;
-          default: cout << "Not valid. Please Make A Choice: " << '\n';
-        }
-      } while(run);
+    cout << '\n' << "Order More? " << '\n';
+    cout << "(Y)es, (N)o, (B)ack to Main" << '\n';
+    cin >> answer;
+      // Check to see if user's input is valid.
+    if(cin.fail()) {
+      cout << "Nice try, Brayden." << endl;
+    }
+    cin.ignore(256, '\n');
 
-      //Since we are working with either a blank file or a file with content    // we can check to see if file is populated or blank.
-      // If blank we will skip emailing.
-      int count = 0;
-      string line;
-      ifstream file("orders.txt");
+    switch (answer) {
+      case 'y': {cout << "Order more of: " << '\n';
+                cin >> ans;
+                cin.ignore(256, '\n');
+                cout << "Quantity? " << '\n';
+                cin >> amount;
+                cin.ignore(256, '\n');
+                cout << "You Have ordered " << amount << " more " << ans << '\n';
+                ofstream myfile;
+                myfile.open("orders.txt", std::ios::app);
+                myfile << ans << " " << amount << '\n';
+                myfile.close();} break;
+      case 'n': run = false; break;
+      case 'b': run = false; break;
+      default: cout << "Not valid. Please Make A Choice: " << '\n';
+    }
+  } while(run);
 
-      while (getline(file, line))
+  // Since we are working with either a blank file or a file with content
+  // we can check to see if file is populated or blank.
+  // If blank we will skip emailing.
+  int count = 0;
+  string line;
+  ifstream file("orders.txt");
 
-          count++;
+  while (getline(file, line))
 
-      if (count > 0) {
-        cout << "Sending email to Purchasing Dept...." << '\n';
-        system("cat /home/group/github/cpp-group-project/orders.txt | mail -s 'Orders' randall.flagg15@gmail.com");
-        cout << "Email Sent!" << '\n' << '\n';
-        //Clear File after email sends....
-        clearFile();
-      }
+      count++;
+
+  if (count > 0) {
+    cout << "Sending email to Purchasing Dept...." << '\n';
+    system("cat /home/group/github/cpp-group-project/orders.txt | mail -s 'Orders' randall.flagg15@gmail.com");
+    cout << "Email Sent!" << '\n' << '\n';
+    // Clear File after email sends....
+    clearFile();
+  }
 
 }
 
@@ -315,7 +314,6 @@ int main( int argc, char *argv[] ) {
   {
     cout << "Inventory Program - " << endl;
 
-    
   	switch ( getMenuResponse() )
   	{
 
