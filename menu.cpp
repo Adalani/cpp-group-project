@@ -52,7 +52,9 @@ void addData() {
  string itemInv;
  string sqlString;
 
- cout << "Add New Item: " << endl << "Item Name: " << endl;
+ cout << "Add New Item: " << endl;
+ cout << "--------------" << endl;
+ cout << "Item Name: " << endl;
  cin >> itemName;
  cin.ignore(256, '\n');
  cout << "Item Price: " << endl;
@@ -61,28 +63,32 @@ void addData() {
  cout << "Item Count: " << endl;
  cin >> itemInv;
  cin.ignore(256, '\n');
+ // Checks whether or not the users input is valid, otherwise, accesses the respective code.
+if(cin.fail() != 'b'||'k'||'a'||'l'||'o'){
+  cout<<"Your input was not valid."<<endl;
+} else {
+  // Add appropriate sql depending on category chosen
+  switch (getCategoryResponse()) {
+    case 'b': sqlString = "INSERT INTO bedroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
+    case 'k': sqlString = "INSERT INTO kitchen (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
+    case 'a': sqlString = "INSERT INTO bathroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
+    case 'l': sqlString = "INSERT INTO livingroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
+    case 'o': sqlString = "INSERT INTO office (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
+    default : cout << "Make a selection:" << '\n';
+  }
 
- // Add appropriate sql depending on category chosen
- switch (getCategoryResponse()) {
-   case 'b': sqlString = "INSERT INTO bedroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
-   case 'k': sqlString = "INSERT INTO kitchen (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
-   case 'a': sqlString = "INSERT INTO bathroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
-   case 'l': sqlString = "INSERT INTO livingroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
-   case 'o': sqlString = "INSERT INTO office (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
-   default : cout << "Make a selection:" << '\n';
- }
+  // turn sqlstring into proper data type
+    const char *newString = sqlString.c_str();
 
- // turn sqlstring into proper data type
-   const char *newString = sqlString.c_str();
+    // Insert data into database
+    if (mysql_query( con, newString )) {
+      finish_with_errors(con);
+    }
 
-   // Insert data into database
-   if (mysql_query( con, newString )) {
-    finish_with_errors(con);
-   }
+    mysql_close(con);
+    cout << "Item Added Successfully!" << endl << endl;
 
-   mysql_close(con);
-   cout << "Item Added Successfully!" << endl << endl;
-
+  }
 }
 //
 // function to display data
@@ -249,18 +255,13 @@ void checkInv() {
 
     if (count > 0) {
       cout << "Sending email to Purchasing Dept...." << '\n';
-      system("cat /home/skunky/Documents/college/COMP1100_cpp/project/cpp-group-project/orders.txt | msmtp -a default randall.flagg15@gmail.com");
+      system("cat /home/group/github/cpp-group-project/orders.txt | mail -s 'Orders' randall.flagg15@gmail.com");
       cout << "Email Sent!" << '\n' << '\n';
       //Clear File after email sends....
       clearFile();
     }
 
-    // Clear file after email.....
-   // clearFile();
-
 }
-
-
 
 
 // Main menu function
@@ -296,7 +297,7 @@ int main( int argc, char *argv[] ) {
   {
     cout << "Inventory Program - " << endl;
 
-    //
+    
   	switch ( getMenuResponse() )
   	{
 	    case 'A': addData(); break;
