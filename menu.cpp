@@ -59,12 +59,21 @@ void addData() {
  cout << "--------------" << endl;
  cout << "Item Name: " << endl;
  cin >> itemName;
+ if(cin.fail()) {
+   cout << "Nice try, Brayden." << endl;
+ }
  cin.ignore(256, '\n');
  cout << "Item Price: " << endl;
  cin >> itemPrice;
+ if(cin.fail()) {
+   cout << "Nice try, Brayden." << endl;
+ }
  cin.ignore(256, '\n');
  cout << "Item Count: " << endl;
  cin >> itemInv;
+ if(cin.fail()) {
+   cout << "Nice try, Brayden." << endl;
+ }
  cin.ignore(256, '\n');
  
  // Check whether or not the user's input is valid.
@@ -227,7 +236,9 @@ void checkInv() {
       cout << '\n' << "Order More? " << '\n';
       cout << "(Y)es, (N)o, (B)ack to Main" << '\n';
       cin >> answer;
-      // Check whether or not the user's input is valid.
+      if(cin.fail()) {
+        cout << "Nice try, Brayden." << endl;
+      }
       cin.ignore(256, '\n');
 
         switch (answer) {
