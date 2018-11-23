@@ -21,9 +21,13 @@ char getCategoryResponse() {
 		 << "> ";
 	cin >> response;
 	cin.ignore(256, '\n');
-  return response;
+  // Check whether or not the user's input is valid.
+    if(cin.fail() == 'b'||'k'||'a'||'l'||'o'){
+      cout<<"Your input is not valid."<<endl;
+    } else {
+    return response;
+  }
 }
-
 // MYSQL Error handling function
 void finish_with_errors(MYSQL *con) {
   fprintf(stderr, "%s\n", mysql_error(con));
@@ -224,23 +228,28 @@ void checkInv() {
       cout << '\n' << "Order More? " << '\n';
       cout << "(Y)es, (N)o, (B)ack to Main" << '\n';
       cin >> answer;
-      cin.ignore(256, '\n');
+      // Check whether or not the user's input is valid.
+      if(cin.fail() != 'y'||'n'||'b'){
+        cout<<"Your input is not valid."<<endl;
+      } else {
+        cin.ignore(256, '\n');
 
-      switch (answer) {
-        case 'y': {cout << "Order more of: " << '\n';
-                  cin >> ans;
-                  cin.ignore(256, '\n');
-                  cout << "Quantity? " << '\n';
-                  cin >> amount;
-                  cin.ignore(256, '\n');
-                  cout << "You Have ordered " << amount << " more " << ans << '\n';
-                  ofstream myfile;
-                  myfile.open("orders.txt", std::ios::app);
-                  myfile << ans << " " << amount << '\n';
-                  myfile.close();} break;
-        case 'n': run = false; break;
-        case 'b': run = false; break;
-        default: cout << "Please Make A Choice: " << '\n';
+        switch (answer) {
+          case 'y': {cout << "Order more of: " << '\n';
+                    cin >> ans;
+                    cin.ignore(256, '\n');
+                    cout << "Quantity? " << '\n';
+                    cin >> amount;
+                    cin.ignore(256, '\n');
+                    cout << "You Have ordered " << amount << " more " << ans << '\n';
+                    ofstream myfile;
+                    myfile.open("orders.txt", std::ios::app);
+                    myfile << ans << " " << amount << '\n';
+                    myfile.close();} break;
+          case 'n': run = false; break;
+          case 'b': run = false; break;
+          default: cout << "Please Make A Choice: " << '\n';
+        }
       }
     } while(run);
 
@@ -263,7 +272,6 @@ void checkInv() {
     }
 
 }
-
 
 // Main menu function
 char getMenuResponse() {
