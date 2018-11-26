@@ -34,6 +34,95 @@ void finish_with_errors(MYSQL *con) {
   exit(1);
 }
 
+//Function to choose by Name within chosen category
+void choose_name(string itemNAME, string category){
+  MYSQL *con = mysql_init(NULL);
+
+  if (con == NULL) {
+    fprintf(stderr, "%s\n", mysql_error(con));
+    exit(1);
+  }
+
+
+  // Conn to MYSQL follows this syntax: "host", "user", "pass", "database"
+  if (mysql_real_connect(con, "localhost", "team", "qwerty", "testdb", 0, NULL, 0) == NULL) {
+    finish_with_errors(con);
+ }
+  cout << "Please enter an Item Name." << endl;
+  cin >> itemNAME;
+  string sqlString = "SELECT * FROM " +category+ " WHERE itemNAME=" + itemNAME + ";";
+
+    const char *newString = sqlString.c_str();
+
+   if (mysql_query(con, newString)) {
+    finish_with_errors(con);
+ }
+
+
+  MYSQL_RES *result = mysql_store_result(con);
+
+  int num_fields = mysql_num_fields(result);
+
+  MYSQL_ROW row;
+
+  while ((row = mysql_fetch_row(result))) {
+    for (int i = 0; i < num_fields; i++) {
+      printf("%s ", row[i] ? row[i] : "NULL" );
+
+    }
+    printf("\n" );
+  }
+
+    mysql_free_result(result);
+    mysql_close(con);
+    cout << " " << endl;
+}
+//Function to choose by ID number within chosen category
+void choose_id (string itemID, string category){
+  MYSQL *con = mysql_init(NULL);
+
+  if (con == NULL) {
+    fprintf(stderr, "%s\n", mysql_error(con));
+    exit(1);
+  }
+
+
+  // Conn to MYSQL follows this syntax: "host", "user", "pass", "database"
+  if (mysql_real_connect(con, "localhost", "team", "qwerty", "testdb", 0, NULL, 0) == NULL) {
+    finish_with_errors(con);
+ }
+  cout << "Please enter an Item ID number." << endl;
+  cin >> itemID;
+  string sqlString = "SELECT * FROM " + category + " WHERE itemID=" + itemID + ";";
+
+    const char *newString = sqlString.c_str();
+
+   if (mysql_query(con, newString)) {
+    finish_with_errors(con);
+ }
+
+
+  MYSQL_RES *result = mysql_store_result(con);
+
+  int num_fields = mysql_num_fields(result);
+
+  MYSQL_ROW row;
+
+  while ((row = mysql_fetch_row(result))) {
+    for (int i = 0; i < num_fields; i++) {
+      printf("%s ", row[i] ? row[i] : "NULL" );
+
+    }
+    printf("\n" );
+  }
+
+    mysql_free_result(result);
+    mysql_close(con);
+    cout << " " << endl;
+}
+
+
+
 // Function to Add Data
 void addData() {
   MYSQL *con = mysql_init(NULL);
@@ -117,45 +206,39 @@ void dispData() {
   if (mysql_real_connect(con, "localhost", "team", "qwerty", "testdb", 0, NULL, 0) == NULL) {
     finish_with_errors(con);
  }
-
-  // Code to ask user a Category
   string sqlString;
+  string itemID;
+  string itemNAME;
+  string category;
+  char choice;
 
-  // Add appropriate sql depending on category chosen
-  switch (getCategoryResponse()) {
-    case 'b': sqlString = "SELECT * FROM bedroom;"; break;
-    case 'k': sqlString = "SELECT * FROM kitchen;"; break;
-    case 'a': sqlString = "SELECT * FROM bathroom;"; break;
-    case 'l': sqlString = "SELECT * FROM livingroom;"; break;
-    case 'o': sqlString = "SELECT * FROM office;"; break;
-    default : cout << "Make a selection:" << '\n';
-  }
+  cout << "Search by [i]d or by [n]ame." << endl;
+  cin >> choice;
+  cin.ignore(254, '\n');
 
-  // convert char
-  const char *newString = sqlString.c_str();
 
-  // Dump database rows:
-  if (mysql_query(con, newString)) {
-    finish_with_errors(con);
-  }
-
-  MYSQL_RES *result = mysql_store_result(con);
-
-  int num_fields = mysql_num_fields(result);
-
-  MYSQL_ROW row;
-
-  while ((row = mysql_fetch_row(result))) {
-    for (int i = 0; i < num_fields; i++) {
-      printf("%s ", row[i] ? row[i] : "NULL" );
-
-    }
-    printf("\n" );
-  }
-
-    mysql_free_result(result);
-    mysql_close(con);
-    cout << " " << endl;
+switch (choice){
+  case 'i': {
+    switch (getCategoryResponse()) {
+      case 'b': category= "bedroom"; choose_id(itemID, category); break;
+      case 'k': category= "kitchen"; choose_id(itemID, category); break;
+      case 'a': category= "bathroom"; choose_id(itemID, category); break;
+      case 'l': category= "livingroom"; choose_id(itemID, category); break;
+      case 'o': category= "office"; choose_id(itemID, category); break;
+      default : cout << "Make a selection:" << '\n';
+    }; break;
+  case 'n': {
+    switch (getCategoryResponse()) {
+      case 'b': category= "bedroom"; choose_name(itemNAME, category); break;
+      case 'k': category= "kitchen"; choose_name(itemNAME, category); break;
+      case 'a': category= "bathroom"; choose_name(itemNAME, category); break;
+      case 'l': category= "livingroom"; choose_name(itemNAME, category); break;
+      case 'o': category= "office"; choose_name(itemNAME, category); break;
+      default : cout << "Make a selection:" << '\n';
+    }; break;
+}
+}
+}
 }
 
 //Function to clear text file
