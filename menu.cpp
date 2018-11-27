@@ -13,6 +13,10 @@ using namespace std;
 // To compile for MYSQL use these flags:
 // g++ menu.cpp -o menu1.out `mysql_config --cflags --libs` --> compiling
 
+// SAM!! Sql query to update Quantity remove <> brackets and fill in info.
+
+// "UPDATE" + <table> + "SET itemInv = itemInv -" +<amount>+ "WHERE itemName = <insert name>;"
+
 char getCategoryResponse() {
 
   char response;
@@ -22,9 +26,9 @@ char getCategoryResponse() {
 	cin >> response;
 	cin.ignore(256, '\n');
   // Check whether or not the user's input is valid.
-    if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
-      cout << "Your input is not valid." << endl;
-    }
+    // if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
+    //   cout << "Your input is not valid." << endl;
+    // }
     return response;
 }
 // MYSQL Error handling function
@@ -167,9 +171,10 @@ void addData() {
  cin.ignore(256, '\n');
 
  // Check whether or not the user's input is valid.
- if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
- cout << "Your input is not valid." << endl;
- } else {
+ // if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
+ // cout << "Your input is not valid." << endl;
+ // } else {
+
   // Add appropriate sql depending on category chosen
   switch (getCategoryResponse()) {
     case 'b': sqlString = "INSERT INTO bedroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
@@ -191,7 +196,7 @@ void addData() {
     mysql_close(con);
     cout << "Item Added Successfully!" << endl << endl;
   }
-}
+
 // //////////////////////// //
 // function to display data //
 // //////////////////////// //
@@ -227,6 +232,7 @@ switch (choice){
       case 'o': category= "office"; choose_id(itemID, category); break;
       default : cout << "Make a selection:" << '\n';
     }; break;
+  }
   case 'n': {
     switch (getCategoryResponse()) {
       case 'b': category= "bedroom"; choose_name(itemNAME, category); break;
@@ -236,8 +242,7 @@ switch (choice){
       case 'o': category= "office"; choose_name(itemNAME, category); break;
       default : cout << "Make a selection:" << '\n';
     }; break;
-}
-}
+  }
 }
 }
 
@@ -248,6 +253,81 @@ void clearFile() {
   myfile.open("orders.txt", ofstream::out | ofstream::trunc);
   myfile.close();
 }
+
+
+//Update inventory function.
+void updateData() {
+
+  MYSQL *con = mysql_init(NULL);
+
+  if (con == NULL) {
+    fprintf(stderr, "%s\n", mysql_error(con));
+    exit(1);
+  }
+
+  // Conn to MYSQL follows this syntax: "host", "user", "pass", "database"
+  if (mysql_real_connect(con, "localhost", "team", "qwerty", "testdb", 0, NULL, 0) == NULL) {
+    finish_with_errors(con);
+  }
+
+
+  // Code for Queries
+  //
+  string sqlString;
+  string name;
+  string amount;
+  char a;
+  cout << "(A)dd Inventory, (R)emove Inventory" << '\n';
+  cin >> a;
+
+  if (a == 'a') {
+    cout << "Item Name: " << '\n';
+    cin >> name;
+    cin.ignore(256, '\n');
+    cout << "How Many to Add?" << '\n';
+    cin >> amount;
+
+
+    switch (getCategoryResponse()) {
+      case 'b': sqlString = "UPDATE bedroom SET itemInv = itemInv + " + amount + " WHERE itemName = " + name + ";"; break;
+      case 'k': sqlString = "UPDATE kitchen SET itemInv = itemInv + " + amount + " WHERE itemName = " + name + ";"; break;
+      case 'a': sqlString = "UPDATE bathroom SET itemInv = itemInv + " + amount + " WHERE itemName = " + name + ";"; break;
+      case 'l': sqlString = "UPDATE livingroom SET itemInv = itemInv + " + amount + " WHERE itemName = " + name + ";"; break;
+      case 'o': sqlString = "UPDATE office SET itemInv = itemInv + " + amount + " WHERE itemName = " + name + ";"; break;
+      default: cout << "Pick an Option" << '\n'; break;
+    }
+  } else if(a == 'r') {
+
+    cout << "Item Name: " << '\n';
+    cin >> name;
+    cin.ignore(256, '\n');
+    cout << "How many Sold?" << '\n';
+    cin >> amount;
+
+
+    switch (getCategoryResponse()) {
+      case 'b': sqlString = "UPDATE bedroom SET itemInv = itemInv - " + amount + " WHERE itemName = " + name + ";"; break;
+      case 'k': sqlString = "UPDATE kitchen SET itemInv = itemInv - " + amount + " WHERE itemName = '" + name + "';"; break;
+      case 'a': sqlString = "UPDATE bathroom SET itemInv = itemInv - " + amount + " WHERE itemName = " + name + ";"; break;
+      case 'l': sqlString = "UPDATE livingroom SET itemInv = itemInv - " + amount + " WHERE itemName = " + name + ";"; break;
+      case 'o': sqlString = "UPDATE office SET itemInv = itemInv - " + amount + " WHERE itemName = '" + name + "';"; break;
+      default: cout << "Pick an Option" << '\n'; break;
+    }
+  } else {
+    cout << "Pick an Option:" << '\n';
+  }
+  // Convert string into chars
+  const char *newString = sqlString.c_str();
+
+  // Insert data into database
+  if (mysql_query( con, newString )) {
+    finish_with_errors(con);
+  }
+
+  mysql_close(con);
+  cout << "Item Updated!" << endl << endl;
+}
+
 
 // function to search low inventory
 void checkInv() {
@@ -279,8 +359,8 @@ void checkInv() {
   // convert char
   const char *newString = sqlString.c_str();
 
-  cout << "You are Low on...." << '\n';
-  // Dump database rows:
+  cout << "\033[1;31mYou are Low on....\033[0m" << '\n';
+
   if (mysql_query(con, newString)) {
     finish_with_errors(con);
   }
@@ -291,6 +371,7 @@ void checkInv() {
 
   MYSQL_ROW row;
 
+  // Dump database rows:
   while ((row = mysql_fetch_row(result))) {
     for (int i = 0; i < num_fields; i++) {
       printf("%s ", row[i] ? row[i] : "NULL" );
@@ -315,9 +396,9 @@ void checkInv() {
     cout << "(Y)es, (N)o, (B)ack to Main" << '\n';
     cin >> answer;
       // Check to see if user's input is valid.
-    if(cin.fail()) {
-      cout << "Nice try, Brayden." << endl;
-    }
+    // if(cin.fail()) {
+    //   cout << "Nice try, Brayden." << endl;
+    // }
     cin.ignore(256, '\n');
 
     switch (answer) {
@@ -350,8 +431,10 @@ void checkInv() {
       count++;
 
   if (count > 0) {
-    cout << "Sending email to Purchasing Dept...." << '\n';
-    system("cat /home/group/github/cpp-group-project/orders.txt | mail -s 'Orders' randall.flagg15@gmail.com");
+    cout << "\033[1;34mSending email to Purchasing Dept....\033[0m" << '\n';
+    // system("cat /home/group/github/cpp-group-project/orders.txt | mail -s 'Orders' randall.flagg15@gmail.com");
+    system("cat /home/skunky/Documents/college/COMP1100_cpp/project/cpp-group-project/orders.txt | mail -s 'Orders' randall.flagg15@gmail.com");
+
     cout << "Email Sent!" << '\n' << '\n';
     // Clear File after email sends....
     clearFile();
@@ -364,12 +447,12 @@ char getMenuResponse() {
 
   char response;
 	cout << endl << "Pick Option: " << endl
-		 << "(A)dd Item, (S)earch, (I)nventory Check (Q)uit" << endl
+		 << "(A)dd Item, (U)pdate Item (S)earch, (I)nventory Check (Q)uit" << endl
 		 << "> ";
 	cin >> response;
-  if (cin.fail() != 'a'||'s'||'i'||'q') {
-    cout << "Your input is not valid." << endl;
-  }
+  // if (cin.fail() != 'a'||'s'||'i'||'q') {
+  //   cout << "Your input is not valid." << endl;
+  // }
 	cin.ignore(256, '\n');
 	return toupper(response);
 
@@ -399,6 +482,7 @@ int main( int argc, char *argv[] ) {
   	{
 
 	    case 'A': addData(); break;
+      case 'U': updateData(); break;
   		case 'S': dispData(); break;
   		case 'I': checkInv(); break;
   		case 'Q': run = false; break;
