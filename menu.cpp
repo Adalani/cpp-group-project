@@ -13,10 +13,6 @@ using namespace std;
 // To compile for MYSQL use these flags:
 // g++ menu.cpp -o menu1.out `mysql_config --cflags --libs` --> compiling
 
-// SAM!! Sql query to update Quantity remove <> brackets and fill in info.
-
-// "UPDATE" + <table> + "SET itemInv = itemInv -" +<amount>+ "WHERE itemName = <insert name>;"
-
 char getCategoryResponse() {
 
   char response;
@@ -25,11 +21,7 @@ char getCategoryResponse() {
 		 << "> ";
 	cin >> response;
 	cin.ignore(256, '\n');
-  // Check whether or not the user's input is valid.
-    // if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
-    //   cout << "Your input is not valid." << endl;
-    // }
-    return response;
+  return response;
 }
 // MYSQL Error handling function
 void finish_with_errors(MYSQL *con) {
@@ -54,7 +46,7 @@ void choose_name(string itemNAME, string category){
  }
   cout << "Please enter an Item Name." << endl;
   cin >> itemNAME;
-  string sqlString = "SELECT * FROM " +category+ " WHERE itemNAME=" + itemNAME + ";";
+  string sqlString = "SELECT * FROM " +category+ " WHERE itemNAME='" + itemNAME + "';";
 
     const char *newString = sqlString.c_str();
 
@@ -170,18 +162,13 @@ void addData() {
  }
  cin.ignore(256, '\n');
 
- // Check whether or not the user's input is valid.
- // if(cin.fail() != 'b'||'k'||'a'||'l'||'o') {
- // cout << "Your input is not valid." << endl;
- // } else {
-
   // Add appropriate sql depending on category chosen
   switch (getCategoryResponse()) {
-    case 'b': sqlString = "INSERT INTO bedroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
-    case 'k': sqlString = "INSERT INTO kitchen (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
-    case 'a': sqlString = "INSERT INTO bathroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
-    case 'l': sqlString = "INSERT INTO livingroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
-    case 'o': sqlString = "INSERT INTO office (itemID, itemName, itemPrice, itemInv) VALUES(itemId," + itemName + "," + itemPrice + "," + itemInv + ")"; break;
+    case 'b': sqlString = "INSERT INTO bedroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId, '" + itemName + "'," + itemPrice + "," + itemInv + ")"; break;
+    case 'k': sqlString = "INSERT INTO kitchen (itemID, itemName, itemPrice, itemInv) VALUES(itemId,'" + itemName + "'," + itemPrice + "," + itemInv + ")"; break;
+    case 'a': sqlString = "INSERT INTO bathroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId,'" + itemName + "'," + itemPrice + "," + itemInv + ")"; break;
+    case 'l': sqlString = "INSERT INTO livingroom (itemID, itemName, itemPrice, itemInv) VALUES(itemId,'" + itemName + "'," + itemPrice + "," + itemInv + ")"; break;
+    case 'o': sqlString = "INSERT INTO office (itemID, itemName, itemPrice, itemInv) VALUES(itemId,'" + itemName + "'," + itemPrice + "," + itemInv + ")"; break;
     default : cout << "Make a selection:" << '\n';
   }
 
@@ -289,11 +276,11 @@ void updateData() {
 
 
     switch (getCategoryResponse()) {
-      case 'b': sqlString = "UPDATE bedroom SET itemInv = itemInv + " + amount + " WHERE itemName = " + name + ";"; break;
-      case 'k': sqlString = "UPDATE kitchen SET itemInv = itemInv + " + amount + " WHERE itemName = " + name + ";"; break;
-      case 'a': sqlString = "UPDATE bathroom SET itemInv = itemInv + " + amount + " WHERE itemName = " + name + ";"; break;
-      case 'l': sqlString = "UPDATE livingroom SET itemInv = itemInv + " + amount + " WHERE itemName = " + name + ";"; break;
-      case 'o': sqlString = "UPDATE office SET itemInv = itemInv + " + amount + " WHERE itemName = " + name + ";"; break;
+      case 'b': sqlString = "UPDATE bedroom SET itemInv = itemInv + " + amount + " WHERE itemName = '" + name + "';"; break;
+      case 'k': sqlString = "UPDATE kitchen SET itemInv = itemInv + " + amount + " WHERE itemName = '" + name + "';"; break;
+      case 'a': sqlString = "UPDATE bathroom SET itemInv = itemInv + " + amount + " WHERE itemName = '" + name + "';"; break;
+      case 'l': sqlString = "UPDATE livingroom SET itemInv = itemInv + " + amount + " WHERE itemName = '" + name + "';"; break;
+      case 'o': sqlString = "UPDATE office SET itemInv = itemInv + " + amount + " WHERE itemName = '" + name + "';"; break;
       default: cout << "Pick an Option" << '\n'; break;
     }
   } else if(a == 'r') {
@@ -306,10 +293,10 @@ void updateData() {
 
 
     switch (getCategoryResponse()) {
-      case 'b': sqlString = "UPDATE bedroom SET itemInv = itemInv - " + amount + " WHERE itemName = " + name + ";"; break;
+      case 'b': sqlString = "UPDATE bedroom SET itemInv = itemInv - " + amount + " WHERE itemName = '" + name + "';"; break;
       case 'k': sqlString = "UPDATE kitchen SET itemInv = itemInv - " + amount + " WHERE itemName = '" + name + "';"; break;
-      case 'a': sqlString = "UPDATE bathroom SET itemInv = itemInv - " + amount + " WHERE itemName = " + name + ";"; break;
-      case 'l': sqlString = "UPDATE livingroom SET itemInv = itemInv - " + amount + " WHERE itemName = " + name + ";"; break;
+      case 'a': sqlString = "UPDATE bathroom SET itemInv = itemInv - " + amount + " WHERE itemName = '" + name + "';"; break;
+      case 'l': sqlString = "UPDATE livingroom SET itemInv = itemInv - " + amount + " WHERE itemName = '" + name + "';"; break;
       case 'o': sqlString = "UPDATE office SET itemInv = itemInv - " + amount + " WHERE itemName = '" + name + "';"; break;
       default: cout << "Pick an Option" << '\n'; break;
     }
@@ -395,10 +382,6 @@ void checkInv() {
     cout << '\n' << "Order More? " << '\n';
     cout << "(Y)es, (N)o, (B)ack to Main" << '\n';
     cin >> answer;
-      // Check to see if user's input is valid.
-    // if(cin.fail()) {
-    //   cout << "Nice try, Brayden." << endl;
-    // }
     cin.ignore(256, '\n');
 
     switch (answer) {
@@ -450,9 +433,6 @@ char getMenuResponse() {
 		 << "(A)dd Item, (U)pdate Item (S)earch, (I)nventory Check (Q)uit" << endl
 		 << "> ";
 	cin >> response;
-  // if (cin.fail() != 'a'||'s'||'i'||'q') {
-  //   cout << "Your input is not valid." << endl;
-  // }
 	cin.ignore(256, '\n');
 	return toupper(response);
 
