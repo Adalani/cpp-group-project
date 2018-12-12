@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include <mysql.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,11 +8,11 @@
 #include <limits>
 #include <fstream>
 
-using namespace std;
-
 // Using C library for MySQL
 // To compile for MYSQL use these flags:
 // g++ menu.cpp -o menu1.out `mysql_config --cflags --libs` --> compiling
+
+using namespace std;
 
 char getCategoryResponse() {
 
@@ -21,8 +22,10 @@ char getCategoryResponse() {
 		 << "> ";
 	cin >> response;
 	cin.ignore(256, '\n');
+  cout << string(100, '\n');
   return response;
 }
+//////////
 // MYSQL Error handling function
 void finish_with_errors(MYSQL *con) {
   fprintf(stderr, "%s\n", mysql_error(con));
@@ -30,6 +33,8 @@ void finish_with_errors(MYSQL *con) {
   exit(1);
 }
 
+
+////////
 //Function to choose by Name within chosen category
 void choose_name(string itemNAME, string category){
   MYSQL *con = mysql_init(NULL);
@@ -48,9 +53,12 @@ void choose_name(string itemNAME, string category){
   cin >> itemNAME;
   string sqlString = "SELECT * FROM " +category+ " WHERE itemNAME='" + itemNAME + "';";
 
-    const char *newString = sqlString.c_str();
+  const char *newString = sqlString.c_str();
 
-   if (mysql_query(con, newString)) {
+  cout << string(100, '\n');
+  cout << "\033[1;34mResults: \033[0m" << '\n';
+  cout << "__________________________________________________" << '\n';
+  if (mysql_query(con, newString)) {
     finish_with_errors(con);
  }
 
@@ -63,7 +71,7 @@ void choose_name(string itemNAME, string category){
 
   while ((row = mysql_fetch_row(result))) {
     for (int i = 0; i < num_fields; i++) {
-      printf("%s ", row[i] ? row[i] : "NULL" );
+      printf("%-10s | ", row[i] ? row[i] : "NULL" );
 
     }
     printf("\n" );
@@ -73,6 +81,8 @@ void choose_name(string itemNAME, string category){
     mysql_close(con);
     cout << " " << endl;
 }
+
+// //////
 //Function to choose by ID number within chosen category
 void choose_id (string itemID, string category){
   MYSQL *con = mysql_init(NULL);
@@ -90,7 +100,11 @@ void choose_id (string itemID, string category){
   cout << "Please enter an Item ID number." << endl;
   cin >> itemID;
   string sqlString = "SELECT * FROM " + category + " WHERE itemID=" + itemID + ";";
-
+  cout << string(100, '\n');
+  cout << "\033[1;34mResults\033[0m" << '\n';
+  cout << "ID     " << "Item     " << "Price     " <<
+  "Stock     " << '\n';
+  cout << "---------------------------------------------------------" << '\n';
     const char *newString = sqlString.c_str();
 
    if (mysql_query(con, newString)) {
@@ -106,7 +120,7 @@ void choose_id (string itemID, string category){
 
   while ((row = mysql_fetch_row(result))) {
     for (int i = 0; i < num_fields; i++) {
-      printf("%s ", row[i] ? row[i] : "NULL" );
+      printf("%-5s  |    ", row[i] ? row[i] : "NULL" );
 
     }
     printf("\n" );
@@ -118,9 +132,10 @@ void choose_id (string itemID, string category){
 }
 
 
-
+///////////////
 // Function to Add Data
 void addData() {
+  // Connect to mysql
   MYSQL *con = mysql_init(NULL);
 
   if (con == NULL) {
@@ -137,29 +152,19 @@ void addData() {
  string itemPrice;
  string itemInv;
  string sqlString;
-
+ cout << string(100, '\n');
  cout << "Add New Item: " << endl;
  cout << "--------------" << endl;
  cout << "Item Name: " << endl;
  cin >> itemName;
- // Check to see if user's input is valid.
- if(cin.fail()) {
-   cout << "Nice try, Brayden." << endl;
- }
+
  cin.ignore(256, '\n');
+ cout << string(100, '\n');
  cout << "Item Price: " << endl;
  cin >> itemPrice;
- // Check to see if user's input is valid.
- if(cin.fail()) {
-   cout << "Nice try, Brayden." << endl;
- }
  cin.ignore(256, '\n');
  cout << "Item Count: " << endl;
  cin >> itemInv;
- // Check to see if user's input is valid.
- if(cin.fail()) {
-   cout << "Nice try, Brayden." << endl;
- }
  cin.ignore(256, '\n');
 
   // Add appropriate sql depending on category chosen
@@ -181,7 +186,9 @@ void addData() {
     }
 
     mysql_close(con);
+    cout << string(100, '\n');
     cout << "Item Added Successfully!" << endl << endl;
+    cout << string(100, '\n');
   }
 
 // //////////////////////// //
@@ -233,6 +240,7 @@ switch (choice){
 }
 }
 
+/////////////////
 //Function to clear text file
 void clearFile() {
 
@@ -242,6 +250,7 @@ void clearFile() {
 }
 
 
+/////////////
 //Update inventory function.
 void updateData() {
 
@@ -287,6 +296,7 @@ void updateData() {
 
     cout << "Item Name: " << '\n';
     cin >> name;
+    cout << string(100, '\n');
     cin.ignore(256, '\n');
     cout << "How many Sold?" << '\n';
     cin >> amount;
@@ -312,13 +322,13 @@ void updateData() {
   }
 
   mysql_close(con);
-  cout << "Item Updated!" << endl << endl;
+  cout << "\033[1;34mItem Updated!\033[0m" << endl << endl;
 }
 
-
+/////////////////////
 // function to search low inventory
 void checkInv() {
-
+  cout << string(100, '\n');
   MYSQL *con = mysql_init(NULL);
 
   if (con == NULL) {
@@ -347,6 +357,9 @@ void checkInv() {
   const char *newString = sqlString.c_str();
 
   cout << "\033[1;31mYou are Low on....\033[0m" << '\n';
+  cout << '\n' << "ID          "   << "Item          " << "Price         " <<
+  "Stock     " << '\n';
+  cout << "-------------------------------------------------------" << '\n';
 
   if (mysql_query(con, newString)) {
     finish_with_errors(con);
@@ -361,7 +374,7 @@ void checkInv() {
   // Dump database rows:
   while ((row = mysql_fetch_row(result))) {
     for (int i = 0; i < num_fields; i++) {
-      printf("%s ", row[i] ? row[i] : "NULL" );
+      printf("%-10s |  ", row[i] ? row[i] : "NULL" );
 
     }
     printf("\n" );
@@ -396,15 +409,15 @@ void checkInv() {
                 myfile.open("orders.txt", std::ios::app);
                 myfile << ans << " " << amount << '\n';
                 myfile.close();} break;
-      case 'n': run = false; break;
-      case 'b': run = false; break;
+      case 'n': run = false; cout << string(100, '\n'); break;
+      case 'b': run = false; cout << string(100, '\n'); break;
       default: cout << "Not valid. Please Make A Choice: " << '\n';
     }
   } while(run);
 
   // Since we are working with either a blank file or a file with content
   // we can check to see if file is populated or blank.
-  // If blank we will skip emailing.
+  // if blank we will skip emailing.
   int count = 0;
   string line;
   ifstream file("orders.txt");
@@ -425,6 +438,7 @@ void checkInv() {
 
 }
 
+////////////////
 // Main menu function
 char getMenuResponse() {
 
@@ -443,6 +457,7 @@ char getMenuResponse() {
 ////////////////////////////////////
 int main( int argc, char *argv[] ) {
   bool run = true;
+  cout << string(100, '\n');
   cout << "######################" << '\n';
   cout << "######################" << '\n';
   cout << "\033[1;31mCNTS GROUP 7 INVENTORY\033[0m" << '\n';
@@ -461,7 +476,7 @@ int main( int argc, char *argv[] ) {
   	switch ( getMenuResponse() )
   	{
 
-	    case 'A': addData(); break;
+	    case 'A': addData();break;
       case 'U': updateData(); break;
   		case 'S': dispData(); break;
   		case 'I': checkInv(); break;
